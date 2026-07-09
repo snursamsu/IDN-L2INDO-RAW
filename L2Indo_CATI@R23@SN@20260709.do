@@ -1,6 +1,6 @@
-* L2Indo CATI ROUND 25
+* L2Indo CATI ROUND 22
 * created by Avralt-Od Purevjav ; modified by Samuel Nursamsu
-* last modified on July 8, 2026
+* last modified on July 9, 2026
 * making sure that there is no left overs 
 
 *-------------------------------------------------------------------------------
@@ -18,8 +18,8 @@
 	* Set round and user
 	********************
 	glo LNG ENG 	
-	glo R 25
-	glo pR 24
+	glo R 23
+	glo pR 22
 	
 	scalar user=2 //1=AP, 2=SN, 3=local team
 	if (user==1) glo wd "C:\Users\wb463427\OneDrive - WBG\L2Indo\CATI\Round${R}"
@@ -31,23 +31,22 @@
 	* Specify import file settings
 	********************************
 	glo M 07
-	glo D 07
+	glo D 09
 	glo Y 2026
 	
-	*Main_Data_Round_25_Listening_To_Indonesia_all_versions_False_2026
-	glo sheet1 "Main Data Round 25 - Listeni..."
-// 	glo version _all_versions_-_False_
-//  glo excel_file Main_Data_-_Listening_To_Indonesia_-${version}-_${Y}-${M}-${D}-${HH}-${MM}-${SS}
-	glo excel_file Main_Data_Round_25_Listening_To_Indonesia_all_versions_False_2026
+	*Main_Data_-_Listening_To_Indonesia_-_all_versions_-_False_-_2024-04-02-12-30-21
+	glo sheet1 "Main Data Round 23 - Listeni..."
+	glo version _all_versions_-_False_
+// 	glo excel_file Main_Data_-_Listening_To_Indonesia_-${version}-_${Y}-${M}-${D}-${HH}-${MM}-${SS}
+	glo excel_file Main_Data_Round_23_Listening_To_Indonesia_all_versions_False_2026
 	glo dta_file l2ind
 	
 	glo date ${Y}${M}${D}	
 	glo date_filter "date == mdy($M, $D, $Y)"
 	
 	* Kobo file
-    * CHECK FROM /kobo folder, get from kobotoolbox
 	****************************************************
-	glo kobofile "auVfpvALCeoQ5vkwfn923g"
+	glo kobofile "aHinij9CdTV8oFKqawz7cB"
 	
 	* Set ado folder and install commands if necessary
 	****************************************************
@@ -84,7 +83,7 @@
 	glo dta "$wd/dta/$date"
 	glo aud "$wd/aud/$date"
     glo log "$wd/log/$date"
-
+    
 
 	* Clean old files
 	****************************
@@ -1340,7 +1339,7 @@
 		as sh2 >= 0 & sh2 <= 30 if sh1 == 1 , r
 
 		as sh3 ~=. if sh1 == 1 , r 
-		as sh3 ==. if sh1 == 2 , r 
+		as sh3 ==. if sh1 == 2 
 
 		as sh4 ~= . , r 
 		as (sh4 >= 0 & sh4 <= 24) , r 
@@ -1562,7 +1561,7 @@
 		**********************
 		use "$zzz/${sheet1}.dta", clear
 		
-		keep hhid koboid uuid sid agreement *mg* OS OT OU OV
+		keep hhid koboid uuid sid agreement *mg* OR OS OT OU
 		keep if agreement == 1
 			cap drop agreement 
 	
@@ -1573,10 +1572,10 @@
 		reshape long mg2@ mg7@ mg11@ , i(koboid hhid sid) j(fmid)   
 	
 		// Renaming 		
-			rename OS mg22
-			rename OT mg23
-			rename OU mg24
-			rename OV mg25
+			rename OR mg22
+			rename OS mg23
+			rename OT mg24
+			rename OU mg25
 
 			
 		//ASSERTIONS
@@ -2059,8 +2058,8 @@
 		save "$raw/${dta_file}_${date}_M15_coping.dta", replace
 		
 	}
-	
 
+	
     * (M16) AIR QUALITY MONITOR   
 	*************************************
 	{
@@ -2154,10 +2153,9 @@
 		la lang ${LNG}
 		save "$raw/${dta_file}_${date}_M19_govspending.dta", replace
 		
-	}    
+	}        
+	
 
-    
-    
 ********************************************************************************
 ********************************************************************************
 
@@ -2427,7 +2425,7 @@
 
 
 		save "${dta}/${dta_file}_${date}_M15_coping.dta", replace
-	
+
     * (M16) AIR QUALITY MONITOR
 	*************************************
 		use "$raw/${dta_file}_${date}_M16_aqm.dta", clear
@@ -2482,11 +2480,11 @@
 		// data fixes 
 
 
-		save "${dta}/${dta_file}_${date}_M19_govspending.dta", replace                        
-    }	
-	
-log close
+		save "${dta}/${dta_file}_${date}_M19_govspending.dta", replace             
+}	
 
+log close
+	
 
 ********************************************************************************
 ********************************************************************************
@@ -2817,4 +2815,4 @@ log close
 	
 }
 		
-    
+		
