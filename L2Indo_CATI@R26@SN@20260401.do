@@ -1,6 +1,6 @@
-* L2Indo CATI ROUND 24
-* created by Avralt-Od Purevjav, modified by Samuel Nursamsu
-* last modified on July 9, 2026
+* L2Indo CATI ROUND 26
+* created by Avralt-Od Purevjav ; modified by Samuel Nursamsu
+* last modified on July 13, 2026
 * making sure that there is no left overs 
 
 *-------------------------------------------------------------------------------
@@ -13,13 +13,13 @@
 	macro drop _all
 // 	set processors 8
 	set processors 6
-	cap log close
-    
+    cap log close
+	
 	* Set round and user
 	********************
 	glo LNG ENG 	
-	glo R 24
-	glo pR 23
+	glo R 26
+	glo pR 25
 	
 	scalar user=2 //1=AP, 2=SN, 3=local team
 	if (user==1) glo wd "C:\Users\wb463427\OneDrive - WBG\L2Indo\CATI\Round${R}"
@@ -30,23 +30,24 @@
 	
 	* Specify import file settings
 	********************************
-	glo M 07
-	glo D 09
+	glo M 04
+	glo D 01
 	glo Y 2026
 	
-	*Main_Data_-_Listening_To_Indonesia_-_all_versions_-_False_-_2024-04-02-12-30-21
-	glo sheet1 "Main Data Round 24 - Listeni..."
-	glo version _all_versions_-_False_
-// 	glo excel_file Main_Data_-_Listening_To_Indonesia_-${version}-_${Y}-${M}-${D}-${HH}-${MM}-${SS}
-	glo excel_file Main_Data_Round_24_Listening_To_Indonesia_all_versions_False_2026
+	*Main_Data_Round_26_Listening_To_Indonesia_all_versions_False_2026
+	glo sheet1 "Main Data Round 26 - Listeni..."
+// 	glo version _all_versions_-_False_
+//  glo excel_file Main_Data_-_Listening_To_Indonesia_-${version}-_${Y}-${M}-${D}-${HH}-${MM}-${SS}
+	glo excel_file Main_Data_Round_26_Listening_To_Indonesia_all_versions_False_2026
 	glo dta_file l2ind
 	
 	glo date ${Y}${M}${D}	
 	glo date_filter "date == mdy($M, $D, $Y)"
 	
 	* Kobo file
+    * CHECK FROM /kobo folder, get from kobotoolbox
 	****************************************************
-	glo kobofile "aewLPeZ2yFiJsjbu5euMWp"
+	glo kobofile "aSkM3DhA9dZDRR3pDgpHwj"
 	
 	* Set ado folder and install commands if necessary
 	****************************************************
@@ -407,7 +408,7 @@
 			{
 				la var start "Start Date/Time (string)"
 					as start ~= "" 
-					split start , parse("T" ".") generate(start_) limit(2)
+					split start , parse(" " "T" ".") generate(start_) limit(2)
 						cap drop start 
 				g double start_date = date(start_1, "YMD") , after(deviceid)
 				la var start_date "Start Date"
@@ -1561,7 +1562,7 @@
 		**********************
 		use "$zzz/${sheet1}.dta", clear
 		
-		keep hhid koboid uuid sid agreement *mg* OR OS OT OU
+		keep hhid koboid uuid sid agreement *mg* OS OT OU OV
 		keep if agreement == 1
 			cap drop agreement 
 	
@@ -1572,10 +1573,10 @@
 		reshape long mg2@ mg7@ mg11@ , i(koboid hhid sid) j(fmid)   
 	
 		// Renaming 		
-			rename OR mg22
-			rename OS mg23
-			rename OT mg24
-			rename OU mg25
+			rename OS mg22
+			rename OT mg23
+			rename OU mg24
+			rename OV mg25
 
 			
 		//ASSERTIONS
@@ -2059,7 +2060,7 @@
 		
 	}
 	
-    
+
     * (M16) AIR QUALITY MONITOR   
 	*************************************
 	{
@@ -2152,10 +2153,34 @@
 		
 		la lang ${LNG}
 		save "$raw/${dta_file}_${date}_M19_govspending.dta", replace
-	}
-    
-    
+		
+	}    
 
+    
+    * (M21) INEQUALITY   
+	*************************************
+	{
+		use "$zzz/${sheet1}.dta", clear
+		keep hhid koboid uuid sid agreement modul_21_note-ineq15_other
+		keep if agreement == 1
+		cap drop agreement 
+			
+		
+		//ASSERTIONS
+			
+		la lang ${LNG}
+		merge 1:1 koboid hhid sid uuid ///
+			using "$raw/${dta_file}_${date}_M00_passport.dta" ///
+				, assert(2 3) nogen keep( 3 ) update ///
+					keepusing( round date time  ) 
+					
+		
+		la lang ${LNG}
+		save "$raw/${dta_file}_${date}_M21_inequality.dta", replace
+		
+	}        
+    
+    
 ********************************************************************************
 ********************************************************************************
 
@@ -2425,7 +2450,7 @@
 
 
 		save "${dta}/${dta_file}_${date}_M15_coping.dta", replace
-
+	
     * (M16) AIR QUALITY MONITOR
 	*************************************
 		use "$raw/${dta_file}_${date}_M16_aqm.dta", clear
@@ -2480,11 +2505,25 @@
 		// data fixes 
 
 
-		save "${dta}/${dta_file}_${date}_M19_govspending.dta", replace            
-}	
+		save "${dta}/${dta_file}_${date}_M19_govspending.dta", replace                 
+        
+    * (M21) INEQUALITY
+	*************************************
+		use "$raw/${dta_file}_${date}_M21_inequality.dta", clear
+
+		cap export excel ///
+				using "$fix/${dta_file}_${date}_M21_inequality.xlsx" ///
+					if ${date_filter} , ///
+						sheet("$date") firstrow(var) nolabel replace 
+
+		// data fixes 
+
+
+		save "${dta}/${dta_file}_${date}_M21_inequality.dta", replace                  
+    }	
 	
 log close
-    
+
 
 ********************************************************************************
 ********************************************************************************
@@ -2815,4 +2854,4 @@ log close
 	
 }
 		
-		
+    

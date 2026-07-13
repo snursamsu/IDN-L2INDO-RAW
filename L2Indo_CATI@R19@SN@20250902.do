@@ -1,4 +1,4 @@
-* L2Indo CATI ROUND 22
+* L2Indo CATI ROUND 19
 * created by Avralt-Od Purevjav ; modified by Samuel Nursamsu 
 * last modified on July 9, 2026
 * making sure that there is no left overs 
@@ -18,10 +18,10 @@
 	* Set round and user
 	********************
 	glo LNG ENG 	
-	glo R 22
-	glo pR 21
+	glo R 19
+	glo pR 18
 	
-	scalar user=2 //1=AP, 2=UA, 3=local team
+	scalar user=2 //1=AP, 2=SN, 3=local team
 	if (user==1) glo wd "C:\Users\wb463427\OneDrive - WBG\L2Indo\CATI\Round${R}"
 	if (user==2) glo wd "C:\Users\wb594719\OneDrive - WBG\EEAPV IDN Documents\Listening to Indonesia (L2INDO)\raw_KOBO\Round${R}"
 	if (user==3) glo wd ""
@@ -30,15 +30,16 @@
 	
 	* Specify import file settings
 	********************************
-	glo M 07
-	glo D 09
-	glo Y 2026
+	glo M 09
+	glo D 02
+	glo Y 2025
+
 	
 	*Main_Data_-_Listening_To_Indonesia_-_all_versions_-_False_-_2024-04-02-12-30-21
-	glo sheet1 "Main Data Round 22 - Listeni..."
+	glo sheet1 "Main Data Round 19 - Listeni..."
 	glo version _all_versions_-_False_
 // 	glo excel_file Main_Data_-_Listening_To_Indonesia_-${version}-_${Y}-${M}-${D}-${HH}-${MM}-${SS}
-	glo excel_file Main_Data_Round_22_Listening_To_Indonesia_all_versions_False_2026
+	glo excel_file Main_Data_Round_19_Listening_To_Indonesia_all_versions_False_2025
 	glo dta_file l2ind
 	
 	glo date ${Y}${M}${D}	
@@ -46,7 +47,7 @@
 	
 	* Kobo file
 	****************************************************
-	glo kobofile "ac4pjzXpHj6JU9uWX9mKTb"
+	glo kobofile "aeJ3AyNMuLuovBbdzAyTSx"
 	
 	* Set ado folder and install commands if necessary
 	****************************************************
@@ -82,8 +83,8 @@
 	glo tab "$wd/tab/$date"
 	glo dta "$wd/dta/$date"
 	glo aud "$wd/aud/$date"
-    glo log "$wd/log/$date"
-    
+    glo log "$wd/log/$date"    
+
 
 	* Clean old files
 	****************************
@@ -96,10 +97,10 @@
 			cap erase "$raw/`file'"
 
 			}
-			
+
     * Log
     ***************************
-    log using "$log/log_${date}.log", replace
+    log using "$log/log_${date}.log", replace			
 }			
 
 ********************************************************************************
@@ -458,6 +459,7 @@
 								modul_1_time
 								sh_time
 								wb_time
+								mg_time 
 								ac_time
 								vw_time 
 								inc_time
@@ -467,8 +469,7 @@
 			
 				//xp_time  
 				//net_time  
-				//ecom_time
-				//mg_time 
+				//ecom_time 
 								
 				foreach t of glo TIMEVARS {
 					split `t' , parse(".") generate(t) limit(2)
@@ -510,11 +511,9 @@
 				g double dur_sh = round((wb_time - sh_time)/60000, 0.001)
 				la var dur_sh  "Duration of Shocks (min)"
 					
-
-// 				cap drop dur_wb	
-// 				g double dur_wb = round((mg_time - wb_time)/60000, 0.001)
-// 				la var dur_wb  "Duration of Wellbeing (min)"
-
+				cap drop dur_wb	
+				g double dur_wb = round((mg_time - wb_time)/60000, 0.001)
+				la var dur_wb  "Duration of Wellbeing (min)"
 					
 				/*
 				cap drop dur_mg_pot	
@@ -529,9 +528,9 @@
 				g double dur_mg_liv = round(( time_mg4 - time_mg3)/60000, 0.001)
 				la var dur_mg_liv  "Duration of Living Migration (min)"
 				*/	
-// 				cap drop dur_mg	
-// 				g double dur_mg = round(( ac_time - mg_time)/60000, 0.001)
-// 				la var dur_mg  "Duration of Migration (min)"
+				cap drop dur_mg	
+				g double dur_mg = round(( ac_time - mg_time)/60000, 0.001)
+				la var dur_mg  "Duration of Migration (min)"
 					
 				/*
 				cap drop dur_ac_emp	
@@ -1174,11 +1173,11 @@
 		//as round(dur_rr) == round(dur_or + dur_nr), r //issue with time stampt time_nr => missing if newmember is missing which is the case for old sample HHs 
 		as dur_rr >= 0 if agreement == 1 , r
 		as dur_sh >= 0 if agreement == 1 , r
-// 		as dur_wb >= 0 if agreement == 1, r
+		as dur_wb >= 0 if agreement == 1, r
 		//as dur_mg_pot >= 0 if agreement == 1 
 		//as dur_mg_ret >= 0 if agreement == 1 		
 		//as dur_mg_liv >= 0 if agreement == 1 	
-// 		as dur_mg >= 0 if agreement == 1, r
+		as dur_mg >= 0 if agreement == 1, r
 		//as dur_ac_emp >= 0 if agreement == 1 	
 		//as dur_ac_look >= 0 if agreement == 1	
 		as dur_ac >= 0 if agreement == 1, r
@@ -1377,8 +1376,8 @@
 		
 		as sh12~=. , r 
 		
-		as sh13~=. if sh12==1, r 
-		as inrange(sh13,0,30)==1 if sh12==1 , r 
+		as sh13~=. if sh12==1
+		as inrange(sh13,0,30)==1 if sh12==1
 		as sh13==. if inlist(sh12, 2,3)==1
 		
 		as sh14~=. , r 
@@ -1545,7 +1544,7 @@
 		merge 1:1 koboid hhid sid uuid ///
 			using "$raw/${dta_file}_${date}_M00_passport.dta" ///
 				, assert(2 3) nogen keep( 3 ) update ///
-					keepusing( round date time /* dur_wb */ ) 
+					keepusing( round date time dur_wb ) 
 					
 		la lang ${LNG}
 		
@@ -1711,7 +1710,7 @@
 		merge m:1 koboid sid hhid  ///
 			using "$raw/${dta_file}_${date}_M00_passport.dta" ///
 				, assert(2 3) nogen keep( 3 ) update ///
-					keepusing(round /* dur_mg* */ ) 
+					keepusing(round dur_mg* ) 
 			
 		la lang ${LNG}
 		save "$raw/${dta_file}_${date}_M04_migration.dta", replace
@@ -1724,7 +1723,7 @@
 		** PASSPORT
 		**********************	
 		use "$zzz/${sheet1}.dta", clear
-		keep hhid koboid uuid sid agreement ac* reemp* 
+		keep hhid koboid uuid sid agreement ac*  
 		keep if agreement == 1
 			cap drop agreement 
 		
@@ -2058,8 +2057,8 @@
 		save "$raw/${dta_file}_${date}_M15_coping.dta", replace
 		
 	}
-
 	
+    
     * (M16) AIR QUALITY MONITOR   
 	*************************************
 	{
@@ -2081,31 +2080,7 @@
 		la lang ${LNG}
 		save "$raw/${dta_file}_${date}_M16_aqm.dta", replace
 		
-	}
-
-    
-    * (M17) LPG SUBSIDY   
-	*************************************
-	{
-		use "$zzz/${sheet1}.dta", clear
-		keep hhid koboid uuid sid agreement modul_17_note-lpg_cope3_other
-		keep if agreement == 1
-		cap drop agreement 
-			
-		
-		//ASSERTIONS
-			
-		la lang ${LNG}
-		merge 1:1 koboid hhid sid uuid ///
-			using "$raw/${dta_file}_${date}_M00_passport.dta" ///
-				, assert(2 3) nogen keep( 3 ) update ///
-					keepusing( round date time  ) 
-					
-		
-		la lang ${LNG}
-		save "$raw/${dta_file}_${date}_M17_lpg.dta", replace
-		
-	}        
+	}    
 	
 
 ********************************************************************************
@@ -2390,25 +2365,9 @@
 		// data fixes 
 
 
-		save "${dta}/${dta_file}_${date}_M16_aqm.dta", replace
-
-    * (M17) LPG SUBSIDY
-	*************************************
-		use "$raw/${dta_file}_${date}_M17_lpg.dta", clear
-
-		cap export excel ///
-				using "$fix/${dta_file}_${date}_M17_lpg.xlsx" ///
-					if ${date_filter} , ///
-						sheet("$date") firstrow(var) nolabel replace 
-
-		// data fixes 
-
-
-		save "${dta}/${dta_file}_${date}_M17_lpg.dta", replace  
-        
-}
-
-log close	
+		save "${dta}/${dta_file}_${date}_M16_aqm.dta", replace        
+}	
+log close
 	
 
 ********************************************************************************

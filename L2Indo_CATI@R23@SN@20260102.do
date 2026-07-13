@@ -1,4 +1,4 @@
-* L2Indo CATI ROUND 22
+* L2Indo CATI ROUND 23
 * created by Avralt-Od Purevjav ; modified by Samuel Nursamsu
 * last modified on July 9, 2026
 * making sure that there is no left overs 
@@ -30,8 +30,8 @@
 	
 	* Specify import file settings
 	********************************
-	glo M 07
-	glo D 09
+	glo M 01
+	glo D 02
 	glo Y 2026
 	
 	*Main_Data_-_Listening_To_Indonesia_-_all_versions_-_False_-_2024-04-02-12-30-21

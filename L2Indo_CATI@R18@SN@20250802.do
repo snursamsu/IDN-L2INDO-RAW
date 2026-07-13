@@ -30,9 +30,9 @@
 	
 	* Specify import file settings
 	********************************
-	glo M 07
-	glo D 09
-	glo Y 2026
+	glo M 08
+	glo D 02
+	glo Y 2025
 
 	
 	*Main_Data_-_Listening_To_Indonesia_-_all_versions_-_False_-_2024-04-02-12-30-21

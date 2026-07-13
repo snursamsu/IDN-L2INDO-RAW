@@ -1,4 +1,4 @@
-* L2Indo CATI ROUND 21
+* L2Indo CATI ROUND 22
 * created by Avralt-Od Purevjav ; modified by Samuel Nursamsu 
 * last modified on July 9, 2026
 * making sure that there is no left overs 
@@ -18,8 +18,8 @@
 	* Set round and user
 	********************
 	glo LNG ENG 	
-	glo R 21
-	glo pR 20
+	glo R 22
+	glo pR 21
 	
 	scalar user=2 //1=AP, 2=UA, 3=local team
 	if (user==1) glo wd "C:\Users\wb463427\OneDrive - WBG\L2Indo\CATI\Round${R}"
@@ -30,16 +30,15 @@
 	
 	* Specify import file settings
 	********************************
-	glo M 07
-	glo D 09
-	glo Y 2026
-
+	glo M 12
+	glo D 02
+	glo Y 2025
 	
 	*Main_Data_-_Listening_To_Indonesia_-_all_versions_-_False_-_2024-04-02-12-30-21
-	glo sheet1 "Main Data Round 21 - Listeni..."
+	glo sheet1 "Main Data Round 22 - Listeni..."
 	glo version _all_versions_-_False_
 // 	glo excel_file Main_Data_-_Listening_To_Indonesia_-${version}-_${Y}-${M}-${D}-${HH}-${MM}-${SS}
-	glo excel_file Main_Data_Round_21_Listening_To_Indonesia_all_versions_False_2025
+	glo excel_file Main_Data_Round_22_Listening_To_Indonesia_all_versions_False_2026
 	glo dta_file l2ind
 	
 	glo date ${Y}${M}${D}	
@@ -47,7 +46,7 @@
 	
 	* Kobo file
 	****************************************************
-	glo kobofile "a9jFuwCoZyUXZCxVi2HCRC"
+	glo kobofile "ac4pjzXpHj6JU9uWX9mKTb"
 	
 	* Set ado folder and install commands if necessary
 	****************************************************
@@ -83,8 +82,8 @@
 	glo tab "$wd/tab/$date"
 	glo dta "$wd/dta/$date"
 	glo aud "$wd/aud/$date"
-    glo log "$wd/log/$date"    
-
+    glo log "$wd/log/$date"
+    
 
 	* Clean old files
 	****************************
@@ -2082,7 +2081,31 @@
 		la lang ${LNG}
 		save "$raw/${dta_file}_${date}_M16_aqm.dta", replace
 		
-	}    
+	}
+
+    
+    * (M17) LPG SUBSIDY   
+	*************************************
+	{
+		use "$zzz/${sheet1}.dta", clear
+		keep hhid koboid uuid sid agreement modul_17_note-lpg_cope3_other
+		keep if agreement == 1
+		cap drop agreement 
+			
+		
+		//ASSERTIONS
+			
+		la lang ${LNG}
+		merge 1:1 koboid hhid sid uuid ///
+			using "$raw/${dta_file}_${date}_M00_passport.dta" ///
+				, assert(2 3) nogen keep( 3 ) update ///
+					keepusing( round date time  ) 
+					
+		
+		la lang ${LNG}
+		save "$raw/${dta_file}_${date}_M17_lpg.dta", replace
+		
+	}        
 	
 
 ********************************************************************************
@@ -2367,9 +2390,25 @@
 		// data fixes 
 
 
-		save "${dta}/${dta_file}_${date}_M16_aqm.dta", replace        
-}	
-log close
+		save "${dta}/${dta_file}_${date}_M16_aqm.dta", replace
+
+    * (M17) LPG SUBSIDY
+	*************************************
+		use "$raw/${dta_file}_${date}_M17_lpg.dta", clear
+
+		cap export excel ///
+				using "$fix/${dta_file}_${date}_M17_lpg.xlsx" ///
+					if ${date_filter} , ///
+						sheet("$date") firstrow(var) nolabel replace 
+
+		// data fixes 
+
+
+		save "${dta}/${dta_file}_${date}_M17_lpg.dta", replace  
+        
+}
+
+log close	
 	
 
 ********************************************************************************
