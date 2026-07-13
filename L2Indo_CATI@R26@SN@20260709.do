@@ -1,6 +1,6 @@
 * L2Indo CATI ROUND 25
 * created by Avralt-Od Purevjav ; modified by Samuel Nursamsu
-* last modified on July 7, 2026
+* last modified on July 8, 2026
 * making sure that there is no left overs 
 
 *-------------------------------------------------------------------------------
@@ -18,8 +18,8 @@
 	* Set round and user
 	********************
 	glo LNG ENG 	
-	glo R 25
-	glo pR 24
+	glo R 26
+	glo pR 25
 	
 	scalar user=2 //1=AP, 2=SN, 3=local team
 	if (user==1) glo wd "C:\Users\wb463427\OneDrive - WBG\L2Indo\CATI\Round${R}"
@@ -31,7 +31,7 @@
 	* Specify import file settings
 	********************************
 	glo M 07
-	glo D 07
+	glo D 09
 	glo Y 2026
 	
 	*Main_Data_Round_25_Listening_To_Indonesia_all_versions_False_2026
