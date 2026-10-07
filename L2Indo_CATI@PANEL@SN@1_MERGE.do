@@ -1,6 +1,6 @@
 * L2Indo CATI MERGING DOFILE - AUTOMATED
 * created by Samuel Nursamsu
-* last modified on July 14, 2026
+* last modified on September 29, 2026
 
 * auto-discovery + auto-harmonization refactor
 * --------------------------------------------
@@ -14,6 +14,7 @@
 *    files, finds variables that appear as string in some rounds and numeric in
 *    others, and forces those to string. That replaces the hand-written
 *    `tostring' / `capture drop' blocks you had per module.
+* 3. Change or add the date list to capture which versions to use
 *
 * NOTE: `tostring ... , force' can lose precision on genuinely numeric vars that
 * were accidentally stored as string in one round.
@@ -46,7 +47,7 @@
 
     * Set latest round
     *------------------
-    glo R 28
+    glo R 30
     
     * Log 
     *-----
@@ -56,19 +57,31 @@
 ********************************************************************************        
         
 *-------------------------------------------------------------------------------
+* FILE VERSION DATES — update this list when new rounds arrive
+*-------------------------------------------------------------------------------
+    global dates ///
+        20240331 20240430 20240605 20240708 20240801 20240903 20241002 ///
+        20241101 20241201 20250101 20250201 20250301 20250401 20250501 ///
+        20250601 20250701 20250801 20250802 20250902 20251002 20251102 ///
+        20251202 20260102 20260202 20260301 20260401 20260501 20260601 ///
+        20260701 20260801
+
+*-------------------------------------------------------------------------------
 * GENERIC MERGE ENGINE
 *-------------------------------------------------------------------------------
-
 capture program drop mergemod
 program define mergemod
     args mod
-    * mod = module suffix as it appears in the filename, e.g. M17_lpg
 
-    *---------------------------------------------------------------
-    * 1. Discover every existing file for this module, in date order
-    *---------------------------------------------------------------
-    local flist : dir "$in" files "l2ind_*_`mod'.dta"
-    local flist : list sort flist
+    * Build file list from global dates
+    local flist ""
+    foreach d of global dates {
+        cap confirm file "$in/l2ind_`d'_`mod'.dta"
+        if _rc == 0 {
+            local flist `flist' l2ind_`d'_`mod'.dta
+        }
+    }
+    
     local n : word count `flist'
     if `n' == 0 {
         di as error "  >> [`mod'] no files found — skipped."
@@ -136,6 +149,15 @@ program define mergemod
     *---------------------------------------------------------------
     capture confirm variable date
     if !_rc capture gen mofd = mofd(date)
+
+    * Deduplicate (in case multiple file versions exist for the same round)
+    capture confirm variable fmid
+    if !_rc {
+        bys hhid fmid mofd: keep if _n==1
+    }
+    else {
+        bys hhid mofd: keep if _n==1
+    }
 
     quietly save "$out/l2indo_`mod'.dta", replace
     di as result "  >> saved l2indo_`mod'.dta   (N = " _N ", vars = " c(k) ")"
